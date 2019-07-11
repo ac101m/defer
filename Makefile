@@ -5,15 +5,13 @@ IMMEDIATE_EXEC ?= bin/immediate
 # Directory controls
 OBJ_DIR ?= build
 SRC_DIR ?= src
-INC_DIR ?= include
-LIB_DIR ?= lib
 
 # Compiler configuration
 CXX = g++
-INC_FLAGS := $(addprefix -I,$(INC_DIR))
+INC_FLAGS := -Iinclude -Isrc
 BASE_FLAGS ?= -MMD -MP -m64 -std=c++11 -Wall
 FLAGS ?= $(INC_FLAGS) $(BASE_FLAGS) $(LD_FLAGS) -g
-LD_FLAGS ?= -lglfw -lGLEW -lGL
+LD_FLAGS ?= -loptparse -lgltools -lglfw -lGLEW -lGL
 
 # Sources which define main functions
 MAIN_SRCS := $(shell find $(SRC_DIR) -maxdepth 1 -name *.cpp)
