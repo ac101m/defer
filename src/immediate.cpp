@@ -77,6 +77,7 @@ int main(int argc, char **argv) {
 
   // Mesh positioning
   std::vector<glm::vec3> meshPositions;
+  std::vector<glm::vec3> meshRotationAxes;
   glm::uvec3 gridSize = glm::uvec3(8, 8, 8);
   glm::vec3 gridStep = glm::vec3(1.5, 1.5, 1.5);
   for(unsigned i = 0; i < gridSize.x; i++) {
@@ -84,6 +85,8 @@ int main(int argc, char **argv) {
       for(unsigned k = 0; k < gridSize.z; k++) {
         glm::vec3 index = glm::vec3(i, j, k);
         meshPositions.push_back(index * gridStep);
+        meshRotationAxes.push_back(
+          glm::normalize(RandVec3(glm::vec3(-1.0), glm::vec3(1.0))));
       }
     }
   }
@@ -142,16 +145,15 @@ int main(int argc, char **argv) {
     window.camera.Move(dRight, dUp, dFwd);
     window.camera.MoveLook(-cursorDelta.x, cursorDelta.y, dr);
 
-    // Compute mesh transform
-    glm::mat4 mRot = glm::rotate(
-      glm::mat4(1.0f),
-      (float)window.GetTime() / 3,
-      glm::vec3(0, 1, 0));
-
-    // Draw the mesh
+    // Draw the meshes
     for(unsigned i = 0; i < meshPositions.size(); i++) {
+
+      // Build the model matrix
       glm::mat4 m = glm::mat4(1.0);
-      m = glm::translate(m, meshPositions[i]) * mRot;
+      m = glm::translate(m, meshPositions[i]);
+      m = glm::rotate(m, (float)window.GetTime() / 3, meshRotationAxes[i]);
+
+      // Draw the meshes
       cubeMesh.Draw(window.camera, shader, m);
     }
 
