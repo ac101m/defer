@@ -21,7 +21,7 @@ uniform int lightCount = 0;
 uniform mat2x3 lights[64];
 
 // Outputs
-out vec4 gl_FragColor;
+out vec4 fragColour;
 
 
 void main() {
@@ -32,9 +32,7 @@ void main() {
   vec3 fragNmlWs = normalize((texNormal * 2.0) - 1.0);
   fragNmlWs = normalize(fsIn.tbnMx * fragNmlWs);
 
-  // Ambient contribution to lighting
-  vec3 ambientLighting = ambientLighting * texColour;
-
+  // Compute point lighting contribution
   vec3 pointLighting = vec3(0.0);
   for(int i = 0; i < lightCount; i++) {
     vec3 l = lights[i][0] - fsIn.vertPosWs;
@@ -44,7 +42,7 @@ void main() {
   }
 
   // Add up lighting contributions
-  vec3 fragColour = pointLighting + ambientLighting;
-
-  gl_FragColor = vec4(fragColour, 1.0);
+  vec3 fragLighting = pointLighting + vec3(ambientLighting);
+  vec3 colour = texColour * fragLighting;
+  fragColour = vec4(colour, 1.0);
 }
