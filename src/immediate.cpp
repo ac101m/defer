@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
 
   // Input sensitifity stuff
   float rotateSpeed = 1.0f;
-  float moveSpeed = 1.0f;
+  float moveSpeed = 5.0f;
   float mouseSensitivity = 0.003f;
 
   // Camera movement
