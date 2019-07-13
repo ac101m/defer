@@ -5,6 +5,9 @@
 #include <GLT/Window.hpp>
 #include <optparse.hpp>
 
+// This project
+#include <mesh.hpp>
+
 
 // Add command line optioons to the option parser
 void AddOptions(OptionParser& opt) {
@@ -14,6 +17,9 @@ void AddOptions(OptionParser& opt) {
   opt.Add(Option("displayy", 'y', ARG_TYPE_INT,
                  "Set height of the render area",
                  {"768"}));
+  opt.Add(Option("lights", 'l', ARG_TYPE_INT,
+                 "Set number of lights",
+                 {"16"}));
 }
 
 
@@ -61,8 +67,67 @@ int main(int argc, char **argv) {
   int displayy = opt.Get("displayy");
   GLT::Window window = GLT::Window(displayx, displayy, "immediate");
 
+  // Build shader program
+  GLT::ShaderProgram shader = GLT::ShaderProgram({
+    GLT::Shader(GL_VERTEX_SHADER, "shaders/iVert.glsl"),
+    GLT::Shader(GL_FRAGMENT_SHADER, "shaders/iFrag.glsl")});
+
+  // Create some lights
+  std::vector<glm::mat2x3> lights(2);
+  lights[0] = {glm::vec3(0, 0, 1), glm::vec3(0.5, 0, 0)};
+  lights[1] = {glm::vec3(0, 0, -1), glm::vec3(0, 0, 0.5)};
+
+  // Set lighting uniforms
+  shader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
+  shader.GetUniform("lightCount").SetI1(lights.size());
+
+  // Create test mesh
+  GLT::Mesh cubeMesh = GenCubeMesh();
+
+  // Input sensitifity stuff
+  float rotateSpeed = 1.0f;
+  float moveSpeed = 1.0f;
+  float mouseSensitivity = 0.003f;
+
+  // Camera movement
+  float dFwd, dRight, dUp, dr;
+
   // Main render loop
   while(!window.ShouldClose()) {
+
+    // get current time
+    float dt = window.GetTimeDelta();
+
+    // Cursor capture control
+    glm::vec2 cursorDelta = window.GetCursorDelta() * mouseSensitivity;
+    if(window.KeyPressed(GLFW_KEY_ESCAPE)) window.FreeCursor();
+    if(window.KeyPressed(GLFW_KEY_M)) window.CaptureCursor();
+
+    // Camera translation & rotation
+    dr = dFwd = dRight = dUp = 0.0f;
+    if(window.KeyPressed(GLFW_KEY_W)) dFwd += (dt * moveSpeed);
+    if(window.KeyPressed(GLFW_KEY_S)) dFwd -= (dt * moveSpeed);
+    if(window.KeyPressed(GLFW_KEY_A)) dRight += (dt * moveSpeed);
+    if(window.KeyPressed(GLFW_KEY_D)) dRight -= (dt * moveSpeed);
+    if(window.KeyPressed(GLFW_KEY_SPACE)) dUp += (dt * moveSpeed);
+    if(window.KeyPressed(GLFW_KEY_C)) dUp -= (dt * moveSpeed);
+    if(window.KeyPressed(GLFW_KEY_E)) dr += (dt * rotateSpeed);
+    if(window.KeyPressed(GLFW_KEY_Q)) dr -= (dt * rotateSpeed);
+
+    // Update camera
+    window.camera.Move(dRight, dUp, dFwd);
+    window.camera.MoveLook(-cursorDelta.x, cursorDelta.y, dr);
+
+    // Compute mesh transform
+    glm::mat4 m = glm::rotate(
+      glm::mat4(1.0f),
+      (float)window.GetTime() / 3,
+      glm::vec3(0, 1, 0));
+
+    // Draw the mesh
+    window.Draw(cubeMesh, shader, m);
+
+    // Update the stuff
     window.Refresh();
   }
 
