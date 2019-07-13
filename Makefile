@@ -16,12 +16,12 @@ LD_FLAGS ?= -loptparse -lgltools -lglfw -lGLEW -lGL
 # Sources which define main functions
 MAIN_SRCS := $(shell find $(SRC_DIR) -maxdepth 1 -name *.cpp)
 MAIN_OBJS := $(MAIN_SRCS:%=$(OBJ_DIR_RELEASE)/%.o)
-MAIN_DEPS := $(MAIN_OBJS_DEBUG:.o=.d) $(MAIN_OBJS_RELEASE:.o=.d)
+MAIN_DEPS := $(MAIN_OBJS:.o=.d) $(MAIN_OBJS:.o=.d)
 
 # "Subordinate" sources which do not define mains
 SUB_SRCS := $(shell find $(SRC_DIR) -mindepth 2 -name *.cpp)
 SUB_OBJS := $(SUB_SRCS:%=$(OBJ_DIR_RELEASE)/%.o)
-SUB_DEPS := $(SUB_OBJS_DEBUG:.o=.d) $(SUB_OBJS_RELEASE:.o=.d)
+SUB_DEPS := $(SUB_OBJS:.o=.d) $(SUB_OBJS:.o=.d)
 
 # C++ object compilation
 $(OBJ_DIR)/%.cpp.o: %.cpp
