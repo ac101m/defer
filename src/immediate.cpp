@@ -19,7 +19,7 @@ void AddOptions(OptionParser& opt) {
                  {"768"}));
   opt.Add(Option("lights", 'l', ARG_TYPE_INT,
                  "Set number of lights",
-                 {"16"}));
+                 {"64"}));
 }
 
 
