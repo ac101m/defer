@@ -38,7 +38,7 @@ void main() {
     vec3 l = lights[i][0] - fsIn.vertPosWs;
     float dist = length(l);
     float cosTheta = clamp(dot(fragNmlWs, l), 0.0, 1.0);
-    pointLighting += (texColour * lights[i][1] * cosTheta) / (dist * dist);
+    pointLighting += (lights[i][1] * cosTheta) / (dist * dist);
   }
 
   // Add up lighting contributions
