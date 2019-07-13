@@ -63,6 +63,10 @@ int main(int argc, char **argv) {
   OptionParser opt(argc, argv, "Simple immediate renderer");
   AddOptions(opt);
 
+  // Hint at majopr opengl version
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+
   // Get display parameters and open a window
   int displayx = opt.Get("displayx");
   int displayy = opt.Get("displayy");
