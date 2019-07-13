@@ -7,6 +7,7 @@
 
 // This project
 #include <mesh.hpp>
+#include <utils.hpp>
 
 
 // Add command line optioons to the option parser
@@ -74,10 +75,6 @@ int main(int argc, char **argv) {
     GLT::Shader(GL_VERTEX_SHADER, "shaders/iVert.glsl"),
     GLT::Shader(GL_FRAGMENT_SHADER, "shaders/iFrag.glsl")});
 
-  // Create some lights
-  std::vector<glm::mat2x3> lights(2);
-  lights[0] = {glm::vec3(0, 0, 1), glm::vec3(0.5, 0, 0)};
-  lights[1] = {glm::vec3(0, 0, -1), glm::vec3(0, 0, 0.5)};
   // Mesh positioning
   std::vector<glm::vec3> meshPositions;
   glm::uvec3 gridSize = glm::uvec3(8, 8, 8);
@@ -89,6 +86,19 @@ int main(int argc, char **argv) {
         meshPositions.push_back(index * gridStep);
       }
     }
+  }
+
+  // Randomly distribute point lights
+  glm::vec3 lightMin = glm::vec3(0.0);
+  glm::vec3 lightMax = glm::vec3(1.0);
+  glm::vec3 positionMin = -gridStep;
+  glm::vec3 positionMax = glm::vec3(glm::vec3(gridSize) * gridStep);
+  int lightCount = opt.Get("lights");
+  std::vector<glm::mat2x3> lights;
+  for(int i = 0; i < lightCount; i++) {
+    glm::vec3 lightIntensity = RandVec3(lightMin, lightMax);
+    glm::vec3 lightPosition = RandVec3(positionMin, positionMax);
+    lights.push_back({lightPosition, lightIntensity});
   }
 
   // Set lighting uniforms
