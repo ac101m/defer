@@ -76,6 +76,18 @@ int main(int argc, char **argv) {
   std::vector<glm::mat2x3> lights(2);
   lights[0] = {glm::vec3(0, 0, 1), glm::vec3(0.5, 0, 0)};
   lights[1] = {glm::vec3(0, 0, -1), glm::vec3(0, 0, 0.5)};
+  // Mesh positioning
+  std::vector<glm::vec3> meshPositions;
+  glm::uvec3 gridSize = glm::uvec3(8, 8, 8);
+  glm::vec3 gridStep = glm::vec3(1.5, 1.5, 1.5);
+  for(unsigned i = 0; i < gridSize.x; i++) {
+    for(unsigned j = 0; j < gridSize.y; j++) {
+      for(unsigned k = 0; k < gridSize.z; k++) {
+        glm::vec3 index = glm::vec3(i, j, k);
+        meshPositions.push_back(index * gridStep);
+      }
+    }
+  }
 
   // Set lighting uniforms
   shader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
@@ -119,13 +131,17 @@ int main(int argc, char **argv) {
     window.camera.MoveLook(-cursorDelta.x, cursorDelta.y, dr);
 
     // Compute mesh transform
-    glm::mat4 m = glm::rotate(
+    glm::mat4 mRot = glm::rotate(
       glm::mat4(1.0f),
       (float)window.GetTime() / 3,
       glm::vec3(0, 1, 0));
 
     // Draw the mesh
-    window.Draw(cubeMesh, shader, m);
+    for(unsigned i = 0; i < meshPositions.size(); i++) {
+      glm::mat4 m = glm::mat4(1.0);
+      m = glm::translate(m, meshPositions[i]) * mRot;
+      cubeMesh.Draw(window.camera, shader, m);
+    }
 
     // Update the stuff
     window.Refresh();
