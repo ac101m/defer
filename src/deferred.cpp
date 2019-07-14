@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
   int displayx = opt.Get("displayx");
   int displayy = opt.Get("displayy");
   GLT::Window window = GLT::Window(displayx, displayy, "deferred", mon);
+  glfwSwapInterval(0);
 
   // Build g buffer shader program
   GLT::ShaderProgram gBufferShader = GLT::ShaderProgram({
