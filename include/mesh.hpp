@@ -124,8 +124,8 @@ GLT::Mesh GenCubeMesh(void) {
 
   // Set sampling modes on the textures to linear
   for(unsigned i = 0; i < textures.size(); i++) {
-    textures[i].Parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    textures[i].Parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    textures[i].Parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textures[i].Parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   }
 
   // Package up into mesh and return
