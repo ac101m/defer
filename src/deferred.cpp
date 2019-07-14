@@ -22,6 +22,9 @@ void AddOptions(OptionParser& opt) {
   opt.Add(Option("lights", 'l', ARG_TYPE_INT,
                  "Set number of lights",
                  {"64"}));
+  opt.Add(Option("fullscreen", 'f', ARG_TYPE_VOID,
+                 "Run in fullscreen if defined"
+                 ));
 }
 
 
@@ -70,10 +73,16 @@ int main(int argc, char **argv) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
+  // Get primary monitor for fullscreen if defined
+  GLFWmonitor* mon = NULL;
+  if(opt.Specified("fullscreen")) {
+    mon = glfwGetPrimaryMonitor();
+  }
+
   // Get display parameters and open a window
   int displayx = opt.Get("displayx");
   int displayy = opt.Get("displayy");
-  GLT::Window window = GLT::Window(displayx, displayy, "deferred", glfwGetPrimaryMonitor());
+  GLT::Window window = GLT::Window(displayx, displayy, "deferred", mon);
   window.camera.SetPos(0, 0, -2);
   window.EnableFpsCounter();
 
