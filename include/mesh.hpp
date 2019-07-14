@@ -126,6 +126,7 @@ GLT::Mesh GenCubeMesh(void) {
   for(unsigned i = 0; i < textures.size(); i++) {
     textures[i].Parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     textures[i].Parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textures[i].GenerateMipmaps();
   }
 
   // Package up into mesh and return
