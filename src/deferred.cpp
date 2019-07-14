@@ -112,6 +112,7 @@ int main(int argc, char **argv) {
 
     // Perform lighting pass
     window.MakeCurrent();
+    window.Clear(GL_DEPTH_BUFFER_BIT);
     frameMesh.Draw(lightingShader);
 
     // Update the stuff
