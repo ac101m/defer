@@ -19,10 +19,16 @@ int main(int argc, char **argv) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
+  // Optional fullscreen mode
+  GLFWmonitor* mon = NULL;
+  if(opt.Specified("fullscreen")) {
+    mon = glfwGetPrimaryMonitor();
+  }
+
   // Get display parameters and open a window
   int displayx = opt.Get("displayx");
   int displayy = opt.Get("displayy");
-  GLT::Window window = GLT::Window(displayx, displayy, "immediate", glfwGetPrimaryMonitor());
+  GLT::Window window = GLT::Window(displayx, displayy, "immediate", mon);
   window.camera.SetPos(0, 0, -2);
   window.EnableFpsCounter();
 
