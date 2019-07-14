@@ -5,6 +5,35 @@
 // External
 #include <GLT/Mesh.hpp>
 
+// This project
+#include <frameBuffer.hpp>
+
+
+// Generate full screen quad with textures
+GLT::Mesh GenFrameMesh(FrameBuffer& gBuffer) {
+  std::vector<float> vertexData = {
+    -1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
+    -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
+     1.0f,  1.0f,  0.0f,  1.0f,  1.0f,
+     1.0f, -1.0f,  0.0f,  1.0f,  0.0f};
+
+  // Vertex list
+  std::vector<GLT::vertex_t> vertices;
+  for(unsigned i = 0; i < vertexData.size(); i+= 5) {
+    GLT::vertex_t v;
+    v.position = glm::vec3(vertexData[i], vertexData[i + 1], vertexData[i + 2]);
+    v.uv = glm::vec2(vertexData[i + 3], vertexData[i + 4]);
+    vertices.push_back(v);
+  }
+
+  // Indices
+  std::vector<unsigned> indices = {1, 0, 2, 3, 2, 0};
+
+  // Build the mesh
+  GLT::Mesh mesh(vertices, indices, gBuffer.GetTextures());
+  return mesh;
+}
+
 
 // Generates a cube test mesh with proper indices
 GLT::Mesh GenCubeMesh(void) {

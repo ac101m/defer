@@ -8,6 +8,7 @@
 // This project
 #include <mesh.hpp>
 #include <utils.hpp>
+#include <frameBuffer.hpp>
 
 
 // Add command line optioons to the option parser
@@ -35,7 +36,6 @@ void GLT::Mesh::Draw(
 
   // Shader uniform setup
   shader.GetUniform("mMx").SetFMat4(&m);
-  shader.GetUniform("vMx").SetFMat4(&camera.GetViewMat());
   shader.GetUniform("mvpMx").SetFMat4(&mvp);
 
   // Bind textures to texture units
@@ -44,6 +44,9 @@ void GLT::Mesh::Draw(
     name[7] = 48 + i;
     shader.SetTexture(i, name, this->textures[i]);
   }
+
+  // Use the shader in question
+  shader.Use();
 
   // Draw the things
   this->vertexBuffer.Bind();
@@ -74,10 +77,15 @@ int main(int argc, char **argv) {
   window.camera.SetPos(0, 0, -2);
   window.EnableFpsCounter();
 
-  // Build shader program
-  GLT::ShaderProgram shader = GLT::ShaderProgram({
+  // Build g buffer shader program
+  GLT::ShaderProgram gBufferShader = GLT::ShaderProgram({
     GLT::Shader(GL_VERTEX_SHADER, "shaders/iVert.glsl"),
-    GLT::Shader(GL_FRAGMENT_SHADER, "shaders/iFrag.glsl")});
+    GLT::Shader(GL_FRAGMENT_SHADER, "shaders/dFrag.glsl")});
+
+  // Build lighting shader program
+  GLT::ShaderProgram lightingShader = GLT::ShaderProgram({
+    GLT::Shader(GL_VERTEX_SHADER, "shaders/lVert.glsl"),
+    GLT::Shader(GL_FRAGMENT_SHADER, "shaders/lFrag.glsl")});
 
   // Mesh positioning
   std::vector<glm::vec3> meshPositions;
@@ -108,12 +116,16 @@ int main(int argc, char **argv) {
     lights.push_back({lightPosition, lightIntensity});
   }
 
-  // Set lighting uniforms
-  shader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
-  shader.GetUniform("lightCount").SetI1(lights.size());
+  // Create the G-buffer
+  FrameBuffer gBuffer(displayx, displayy);
+
+  // Set lighting uniforms in lighting shader
+  lightingShader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
+  lightingShader.GetUniform("lightCount").SetI1(lights.size());
 
   // Create test mesh
   GLT::Mesh cubeMesh = GenCubeMesh();
+  GLT::Mesh frameMesh = GenFrameMesh(gBuffer);
 
   // Input sensitifity stuff
   float rotateSpeed = 1.0f;
@@ -145,11 +157,13 @@ int main(int argc, char **argv) {
     if(window.KeyPressed(GLFW_KEY_E)) dr += (dt * rotateSpeed);
     if(window.KeyPressed(GLFW_KEY_Q)) dr -= (dt * rotateSpeed);
 
-    // Update camera
+    // Update camera position
     window.camera.Move(dRight, dUp, dFwd);
     window.camera.MoveLook(-cursorDelta.x, cursorDelta.y, dr);
 
-    // Draw the meshes
+    // Draw meshes to g buffer
+    gBuffer.Bind();
+    gBuffer.Clear();
     for(unsigned i = 0; i < meshPositions.size(); i++) {
 
       // Build the model matrix
@@ -158,8 +172,13 @@ int main(int argc, char **argv) {
       m = glm::rotate(m, (float)window.GetTime() / 3, meshRotationAxes[i]);
 
       // Draw the meshes
-      cubeMesh.Draw(window.camera, shader, m);
+      cubeMesh.Draw(window.camera, gBufferShader, m);
     }
+    gBuffer.Unbind();
+
+    // Perform lighting pass
+    glm::mat4 m = glm::mat4(1.0);
+    window.Draw(frameMesh, lightingShader, m);
 
     // Update the stuff
     window.Refresh();

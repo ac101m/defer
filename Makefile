@@ -10,18 +10,18 @@ SRC_DIR ?= src
 CXX = g++
 INC_FLAGS := -Iinclude -Isrc
 BASE_FLAGS ?= -MMD -MP -m64 -std=c++11 -Wall
-FLAGS ?= $(INC_FLAGS) $(BASE_FLAGS) $(LD_FLAGS) -g
+FLAGS ?= $(BASE_FLAGS) $(INC_FLAGS) $(LD_FLAGS) -g
 LD_FLAGS ?= -loptparse -lgltools -lglfw -lGLEW -lGL
 
 # Sources which define main functions
 MAIN_SRCS := $(shell find $(SRC_DIR) -maxdepth 1 -name *.cpp)
-MAIN_OBJS := $(MAIN_SRCS:%=$(OBJ_DIR_RELEASE)/%.o)
-MAIN_DEPS := $(MAIN_OBJS:.o=.d) $(MAIN_OBJS:.o=.d)
+MAIN_OBJS := $(MAIN_SRCS:%=$(OBJ_DIR)/%.o)
+MAIN_DEPS := $(MAIN_OBJS:.o=.d)
 
 # "Subordinate" sources which do not define mains
 SUB_SRCS := $(shell find $(SRC_DIR) -mindepth 2 -name *.cpp)
-SUB_OBJS := $(SUB_SRCS:%=$(OBJ_DIR_RELEASE)/%.o)
-SUB_DEPS := $(SUB_OBJS:.o=.d) $(SUB_OBJS:.o=.d)
+SUB_OBJS := $(SUB_SRCS:%=$(OBJ_DIR)/%.o)
+SUB_DEPS := $(SUB_OBJS:.o=.d)
 
 # C++ object compilation
 $(OBJ_DIR)/%.cpp.o: %.cpp
