@@ -9,6 +9,7 @@
 #include <mesh.hpp>
 #include <utils.hpp>
 #include <frameBuffer.hpp>
+#include <screenQuad.hpp>
 
 
 // Add command line optioons to the option parser
@@ -125,8 +126,9 @@ int main(int argc, char **argv) {
     lights.push_back({lightPosition, lightIntensity});
   }
 
-  // Create the G-buffer
+  // Create the G-buffer and fullscreen quad for rendering
   FrameBuffer gBuffer(displayx, displayy);
+  ScreenQuad frameMesh(gBuffer.GetTextures());
 
   // Set lighting uniforms in lighting shader
   lightingShader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
@@ -134,7 +136,6 @@ int main(int argc, char **argv) {
 
   // Create test mesh
   GLT::Mesh cubeMesh = GenCubeMesh();
-  GLT::Mesh frameMesh = GenFrameMesh(gBuffer);
 
   // Input sensitifity stuff
   float rotateSpeed = 1.0f;

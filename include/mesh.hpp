@@ -10,7 +10,7 @@
 
 
 // Generate full screen quad with textures
-GLT::Mesh GenFrameMesh(FrameBuffer& gBuffer) {
+GLT::Mesh GenFullscreenQuadMesh(std::vector<GLT::Texture> textures) {
   std::vector<float> vertexData = {
     -1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
     -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
@@ -30,7 +30,7 @@ GLT::Mesh GenFrameMesh(FrameBuffer& gBuffer) {
   std::vector<unsigned> indices = {1, 0, 2, 3, 2, 0};
 
   // Build the mesh
-  GLT::Mesh mesh(vertices, indices, gBuffer.GetTextures());
+  GLT::Mesh mesh(vertices, indices, textures);
   return mesh;
 }
 
