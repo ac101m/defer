@@ -111,8 +111,8 @@ int main(int argc, char **argv) {
     gBuffer.Unbind();
 
     // Perform lighting pass
-    glm::mat4 m = glm::mat4(1.0);
-    window.Draw(frameMesh, lightingShader, m);
+    window.MakeCurrent();
+    frameMesh.Draw(lightingShader);
 
     // Update the stuff
     window.Refresh();

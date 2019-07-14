@@ -44,6 +44,14 @@ public:
     // Set texture back to texture 0
     glActiveTexture(GL_TEXTURE0);
   }
+
+
+  // Simplified draw method
+  void Draw(GLT::ShaderProgram& shader) {
+    GLT::Camera tmpCam = GLT::Camera();
+    glm::mat4 tmpMx = glm::mat4(1.0);
+    this->Draw(tmpCam, shader, tmpMx);
+  }
 };
 
 
