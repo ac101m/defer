@@ -3,31 +3,17 @@
 
 // External
 #include <GLT/Window.hpp>
-#include <optparse.hpp>
 
 // This project
+#include <options.hpp>
 #include <mesh.hpp>
 #include <utils.hpp>
-
-
-// Add command line optioons to the option parser
-void AddOptions(OptionParser& opt) {
-  opt.Add(Option("displayx", 'x', ARG_TYPE_INT,
-                 "Set width of the render area",
-                 {"1024"}));
-  opt.Add(Option("displayy", 'y', ARG_TYPE_INT,
-                 "Set height of the render area",
-                 {"768"}));
-  opt.Add(Option("lights", 'l', ARG_TYPE_INT,
-                 "Set number of lights",
-                 {"64"}));
-}
 
 
 
 int main(int argc, char **argv) {
   OptionParser opt(argc, argv, "Simple immediate renderer");
-  AddOptions(opt);
+  BuildOptionParser(opt);
 
   // Hint at majopr opengl version
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
