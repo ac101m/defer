@@ -40,11 +40,12 @@ int main(int argc, char **argv) {
   // Mesh positioning
   std::vector<glm::vec3> meshPositions;
   std::vector<glm::vec3> meshRotationAxes;
-  glm::uvec3 gridSize = glm::uvec3(8, 8, 8);
+  glm::ivec3 gridStart = glm::uvec3(-3, -3, -3);
+  glm::ivec3 gridEnd = glm::uvec3(3, 3, 3);
   glm::vec3 gridStep = glm::vec3(1.5, 1.5, 1.5);
-  for(unsigned i = 0; i < gridSize.x; i++) {
-    for(unsigned j = 0; j < gridSize.y; j++) {
-      for(unsigned k = 0; k < gridSize.z; k++) {
+  for(int i = gridStart.x; i <= gridEnd.x; i++) {
+    for(int j = gridStart.y; j <= gridEnd.y; j++) {
+      for(int k = gridStart.z; k <= gridEnd.z; k++) {
         glm::vec3 index = glm::vec3(i, j, k);
         meshPositions.push_back(index * gridStep);
         meshRotationAxes.push_back(
@@ -56,8 +57,8 @@ int main(int argc, char **argv) {
   // Randomly distribute point lights
   glm::vec3 lightMin = glm::vec3(0.0);
   glm::vec3 lightMax = glm::vec3(1.0);
-  glm::vec3 positionMin = -gridStep;
-  glm::vec3 positionMax = glm::vec3(glm::vec3(gridSize) * gridStep);
+  glm::vec3 positionMin = glm::vec3(gridStart - glm::ivec3(1)) * gridStep;
+  glm::vec3 positionMax = glm::vec3(gridEnd + glm::ivec3(1)) * gridStep;
   int lightCount = opt.Get("lights");
   std::vector<glm::mat2x3> lights;
   for(int i = 0; i < lightCount; i++) {
