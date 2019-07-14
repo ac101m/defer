@@ -72,39 +72,17 @@ int main(int argc, char **argv) {
   // Create test mesh
   GLT::Mesh cubeMesh = GenCubeMesh();
 
-  // Input sensitifity stuff
-  float rotateSpeed = 1.0f;
-  float moveSpeed = 5.0f;
-  float mouseSensitivity = 0.003f;
-
-  // Camera movement
-  float dFwd, dRight, dUp, dr;
-
   // Main render loop
   while(!window.ShouldClose()) {
 
-    // get current time
-    float dt = window.GetTimeDelta();
+    // Place camera away from origin
+    window.camera.SetPos(0, 0, -18);
 
-    // Cursor capture control
-    glm::vec2 cursorDelta = window.GetCursorDelta() * mouseSensitivity;
-    if(window.KeyPressed(GLFW_KEY_ESCAPE)) window.FreeCursor();
-    if(window.KeyPressed(GLFW_KEY_M)) window.CaptureCursor();
-
-    // Camera translation & rotation
-    dr = dFwd = dRight = dUp = 0.0f;
-    if(window.KeyPressed(GLFW_KEY_W)) dFwd += (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_S)) dFwd -= (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_A)) dRight += (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_D)) dRight -= (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_SPACE)) dUp += (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_C)) dUp -= (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_E)) dr += (dt * rotateSpeed);
-    if(window.KeyPressed(GLFW_KEY_Q)) dr -= (dt * rotateSpeed);
-
-    // Update camera
-    window.camera.Move(dRight, dUp, dFwd);
-    window.camera.MoveLook(-cursorDelta.x, cursorDelta.y, dr);
+    // Rotate camera around the origin
+    window.camera.GetViewMat() = glm::rotate(
+      window.camera.GetViewMat(),
+      (float)window.GetTime() / 6,
+      glm::vec3(0, 1, 0));
 
     // Draw the meshes
     for(unsigned i = 0; i < meshPositions.size(); i++) {
