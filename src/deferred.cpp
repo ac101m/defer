@@ -45,11 +45,12 @@ int main(int argc, char **argv) {
   // Mesh positioning
   std::vector<glm::vec3> meshPositions;
   std::vector<glm::vec3> meshRotationAxes;
-  glm::uvec3 gridSize = glm::uvec3(8, 8, 8);
+  glm::ivec3 gridStart = glm::uvec3(-3, -3, -3);
+  glm::ivec3 gridEnd = glm::uvec3(3, 3, 3);
   glm::vec3 gridStep = glm::vec3(1.5, 1.5, 1.5);
-  for(unsigned i = 0; i < gridSize.x; i++) {
-    for(unsigned j = 0; j < gridSize.y; j++) {
-      for(unsigned k = 0; k < gridSize.z; k++) {
+  for(int i = gridStart.x; i <= gridEnd.x; i++) {
+    for(int j = gridStart.y; j <= gridEnd.y; j++) {
+      for(int k = gridStart.z; k <= gridEnd.z; k++) {
         glm::vec3 index = glm::vec3(i, j, k);
         meshPositions.push_back(index * gridStep);
         meshRotationAxes.push_back(
@@ -61,8 +62,8 @@ int main(int argc, char **argv) {
   // Randomly distribute point lights
   glm::vec3 lightMin = glm::vec3(0.0);
   glm::vec3 lightMax = glm::vec3(1.0);
-  glm::vec3 positionMin = -gridStep;
-  glm::vec3 positionMax = glm::vec3(glm::vec3(gridSize) * gridStep);
+  glm::vec3 positionMin = glm::vec3(gridStart - glm::ivec3(1)) * gridStep;
+  glm::vec3 positionMax = glm::vec3(gridEnd + glm::ivec3(1)) * gridStep;
   int lightCount = opt.Get("lights");
   std::vector<glm::mat2x3> lights;
   for(int i = 0; i < lightCount; i++) {
@@ -82,39 +83,17 @@ int main(int argc, char **argv) {
   // Create test mesh
   GLT::Mesh cubeMesh = GenCubeMesh();
 
-  // Input sensitifity stuff
-  float rotateSpeed = 1.0f;
-  float moveSpeed = 5.0f;
-  float mouseSensitivity = 0.003f;
-
-  // Camera movement
-  float dFwd, dRight, dUp, dr;
-
   // Main render loop
   while(!window.ShouldClose()) {
 
-    // get current time
-    float dt = window.GetTimeDelta();
+    // Place camera away from origin
+    window.camera.SetPos(0, 0, -18);
 
-    // Cursor capture control
-    glm::vec2 cursorDelta = window.GetCursorDelta() * mouseSensitivity;
-    if(window.KeyPressed(GLFW_KEY_ESCAPE)) window.FreeCursor();
-    if(window.KeyPressed(GLFW_KEY_M)) window.CaptureCursor();
-
-    // Camera translation & rotation
-    dr = dFwd = dRight = dUp = 0.0f;
-    if(window.KeyPressed(GLFW_KEY_W)) dFwd += (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_S)) dFwd -= (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_A)) dRight += (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_D)) dRight -= (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_SPACE)) dUp += (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_C)) dUp -= (dt * moveSpeed);
-    if(window.KeyPressed(GLFW_KEY_E)) dr += (dt * rotateSpeed);
-    if(window.KeyPressed(GLFW_KEY_Q)) dr -= (dt * rotateSpeed);
-
-    // Update camera position
-    window.camera.Move(dRight, dUp, dFwd);
-    window.camera.MoveLook(-cursorDelta.x, cursorDelta.y, dr);
+    // Rotate camera around the origin
+    window.camera.GetViewMat() = glm::rotate(
+      window.camera.GetViewMat(),
+      (float)window.GetTime() / 6,
+      glm::vec3(0, 1, 0));
 
     // Draw meshes to g buffer
     gBuffer.Bind();
