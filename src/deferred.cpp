@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
   // Get display parameters and open a window
   int displayx = opt.Get("displayx");
   int displayy = opt.Get("displayy");
-  GLT::Window window = GLT::Window(displayx, displayy, "immediate");
+  GLT::Window window = GLT::Window(displayx, displayy, "immediate", glfwGetPrimaryMonitor());
   window.camera.SetPos(0, 0, -2);
   window.EnableFpsCounter();
 
