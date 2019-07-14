@@ -29,42 +29,6 @@ void AddOptions(OptionParser& opt) {
 }
 
 
-// Mesh draw code
-void GLT::Mesh::Draw(
-  GLT::Camera& camera,
-  GLT::ShaderProgram& shader,
-  glm::mat4& m) {
-
-  // Formulate MVP matrix
-  glm::mat4 mvp = camera.GetProjMat() * camera.GetViewMat() * m;
-
-  // Shader uniform setup
-  shader.GetUniform("mMx").SetFMat4(&m);
-  shader.GetUniform("mvpMx").SetFMat4(&mvp);
-
-  // Bind textures to texture units
-  std::string name = "texture0";
-  for(unsigned i = 0; i < this->textures.size(); i++) {
-    name[7] = 48 + i;
-    shader.SetTexture(i, name, this->textures[i]);
-  }
-
-  // Use the shader in question
-  shader.Use();
-
-  // Draw the things
-  this->vertexBuffer.Bind();
-  glDrawElements(
-    GL_TRIANGLES,
-    this->vertexBuffer.GetIndexBufferLength(),
-    GL_UNSIGNED_INT, 0);
-  this->vertexBuffer.Unbind();
-
-  // Set texture back to texture 0
-  glActiveTexture(GL_TEXTURE0);
-}
-
-
 
 int main(int argc, char **argv) {
   OptionParser opt(argc, argv, "Simple immediate renderer");
