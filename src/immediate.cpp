@@ -29,7 +29,6 @@ int main(int argc, char **argv) {
   int displayx = opt.Get("displayx");
   int displayy = opt.Get("displayy");
   GLT::Window window = GLT::Window(displayx, displayy, "immediate", mon);
-  glfwSwapInterval(0);
 
   // Build shader program
   GLT::ShaderProgram shader = GLT::ShaderProgram({
