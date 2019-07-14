@@ -32,5 +32,5 @@ void main() {
   gPosWs = fsIn.vertPosWs;
   gNmlWs = fragNmlWs;
   gAlbedo.rgb = texColour.rgb;
-  gAlbedo.a = -texRoughness.r;
+  gAlbedo.a = 1.0;
 }

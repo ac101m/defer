@@ -21,11 +21,14 @@ out vec4 fragColourOut;
 
 void main() {
 
+  // Do we need to consider this fragment?
+  float doNotForgetMe = texture(texture2, fragUV).a;
+  if(doNotForgetMe == 0.0) discard;
+
   // Get G-buffer components
   vec3 fragPosWs = texture(texture0, fragUV).rgb;
   vec3 fragNmlWs = texture(texture1, fragUV).rgb;
   vec3 fragColour = texture(texture2, fragUV).rgb;
-  float fragSpecular = texture(texture2, fragUV).a;
 
   // Compute point light contribution
   vec3 pointLighting = vec3(0.0);
