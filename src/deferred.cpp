@@ -14,7 +14,7 @@
 
 
 int main(int argc, char **argv) {
-  OptionParser opt(argc, argv, "Simple immediate renderer");
+  OptionParser opt(argc, argv, "Simple deferred renderer");
   BuildOptionParser(opt);
 
   // Hint at majopr opengl version
