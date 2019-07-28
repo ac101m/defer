@@ -6,7 +6,7 @@
 #include <vector>
 
 // External
-#include <GLT/Texture.hpp>
+#include <GLT/GL/Texture.hpp>
 
 // This project
 #include <mesh.hpp>
