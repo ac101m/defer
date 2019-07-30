@@ -3,12 +3,12 @@
 
 // External
 #include <GLT/Window.hpp>
+#include <GLT/GL/FrameBuffer.hpp>
 
 // This project
 #include <options.hpp>
 #include <mesh.hpp>
 #include <utils.hpp>
-#include <frameBuffer.hpp>
 #include <screenQuad.hpp>
 
 
@@ -72,9 +72,27 @@ int main(int argc, char **argv) {
     lights.push_back({lightPosition, lightIntensity});
   }
 
-  // Create the G-buffer and fullscreen quad for rendering
-  FrameBuffer gBuffer(displayx, displayy);
-  ScreenQuad frameMesh(gBuffer.GetTextures());
+  // Create G-buffer color buffers
+  GLT::Texture gPosition = GLT::Texture(
+    0, GL_RGB16F, displayx, displayy, GL_RGB, GL_FLOAT, 0);
+  GLT::Texture gNormal = GLT::Texture(
+    0, GL_RGB16F, displayx, displayy, GL_RGB, GL_FLOAT, 0);
+  GLT::Texture gAlbedo = GLT::Texture(
+    0, GL_RGBA, displayx, displayy, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+  // Create renderbuffer to serve as depth buffer
+  GLT::RenderBuffer gDepth = GLT::RenderBuffer(
+    GL_DEPTH_COMPONENT, displayx, displayy);
+
+  // Create G-buffer
+  GLT::FrameBuffer gBuffer;
+  gBuffer.AttachTexture2D(gPosition);
+  gBuffer.AttachTexture2D(gNormal);
+  gBuffer.AttachTexture2D(gAlbedo);
+  gBuffer.AttachRenderBuffer(gDepth, GL_DEPTH_ATTACHMENT);
+
+  // Create fullscreen quad for g-buffer rendering
+  ScreenQuad frameMesh(gBuffer.GetColorBuffers());
 
   // Set lighting uniforms in lighting shader
   lightingShader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
@@ -96,8 +114,8 @@ int main(int argc, char **argv) {
       glm::vec3(0, 1, 0));
 
     // Draw meshes to g buffer
-    gBuffer.Bind();
-    gBuffer.Clear();
+    gBuffer.Bind(GL_DRAW_FRAMEBUFFER);
+    gBuffer.Clear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     for(unsigned i = 0; i < meshPositions.size(); i++) {
 
       // Build the model matrix
@@ -108,7 +126,7 @@ int main(int argc, char **argv) {
       // Draw the meshes
       cubeMesh.Draw(window.camera, gBufferShader, m);
     }
-    gBuffer.Unbind();
+    gBuffer.Unbind(GL_DRAW_FRAMEBUFFER);
 
     // Perform lighting pass
     window.MakeCurrent();
