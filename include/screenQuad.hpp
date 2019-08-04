@@ -4,6 +4,8 @@
 
 // Standard
 #include <vector>
+#include <string>
+#include <memory>
 
 // External
 #include <GLT/GL/Texture.hpp>
@@ -16,7 +18,7 @@ class ScreenQuad : public GLT::Mesh {
 public:
 
   // Constructor, construct the base mesh
-  ScreenQuad(std::vector<GLT::Texture> textures) :
+  ScreenQuad(std::vector<std::shared_ptr<GLT::Texture>> textures) :
     GLT::Mesh(GenFullscreenQuadMesh(textures)) {
   }
 
@@ -27,7 +29,9 @@ public:
     std::string name = "texture0";
     for(unsigned i = 0; i < this->textures.size(); i++) {
       name[7] = 48 + i;
-      shader.SetTexture(i, name, this->textures[i]);
+      glActiveTexture(GL_TEXTURE0 + i);
+      this->textures[i]->Bind();
+      shader.GetUniform(name).SetTex2D(i);
     }
 
     // Use the shader in question

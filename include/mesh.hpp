@@ -6,6 +6,10 @@
 #include <GLT/Mesh.hpp>
 
 
+// Standard
+#include <memory>
+
+
 // Mesh draw code
 void GLT::Mesh::Draw(
   GLT::Camera& camera,
@@ -23,7 +27,9 @@ void GLT::Mesh::Draw(
   std::string name = "texture0";
   for(unsigned i = 0; i < this->textures.size(); i++) {
     name[7] = 48 + i;
-    shader.SetTexture(i, name, this->textures[i]);
+    glActiveTexture(GL_TEXTURE0 + i);
+    this->textures[i]->Bind();
+    shader.GetUniform(name).SetTex2D(i);
   }
 
   // Use the shader in question
@@ -43,7 +49,10 @@ void GLT::Mesh::Draw(
 
 
 // Generate full screen quad with textures
-GLT::Mesh GenFullscreenQuadMesh(std::vector<GLT::Texture> textures) {
+GLT::Mesh GenFullscreenQuadMesh(
+  std::vector<std::shared_ptr<GLT::Texture>> textures) {
+
+  // Vertex data
   std::vector<float> vertexData = {
     -1.0f, -1.0f,  0.0f,  0.0f,  0.0f,
     -1.0f,  1.0f,  0.0f,  0.0f,  1.0f,
@@ -117,15 +126,15 @@ GLT::Mesh GenCubeMesh(void) {
   }
 
   // Load the side texture
-  std::vector<GLT::Texture> textures = {
-    GLT::Texture("textures/brownrock/colour.png", 16),
-    GLT::Texture("textures/brownrock/normal.png", 16),
-    GLT::Texture("textures/brownrock/roughness.png", 16)};
+  std::vector<std::shared_ptr<GLT::Texture>> textures = {
+    std::shared_ptr<GLT::Texture>(new GLT::Texture2D("textures/brownrock/colour.png", 16)),
+    std::shared_ptr<GLT::Texture>(new GLT::Texture2D("textures/brownrock/normal.png", 16)),
+    std::shared_ptr<GLT::Texture>(new GLT::Texture2D("textures/brownrock/roughness.png", 16))};
 
   // Set sampling modes on the textures to linear
   for(unsigned i = 0; i < textures.size(); i++) {
-    textures[i].Parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    textures[i].Parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    textures[i]->Parameteri(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    textures[i]->Parameteri(GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   }
 
   // Package up into mesh and return

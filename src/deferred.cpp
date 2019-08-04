@@ -73,12 +73,12 @@ int main(int argc, char **argv) {
   }
 
   // Create G-buffer color buffers
-  GLT::Texture gPosition = GLT::Texture(
-    0, GL_RGB16F, displayx, displayy, GL_RGB, GL_FLOAT, 0);
-  GLT::Texture gNormal = GLT::Texture(
-    0, GL_RGB16F, displayx, displayy, GL_RGB, GL_FLOAT, 0);
-  GLT::Texture gAlbedo = GLT::Texture(
-    0, GL_RGBA, displayx, displayy, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  std::shared_ptr<GLT::Texture2D> gPosition(new GLT::Texture2D(
+    0, GL_RGB16F, displayx, displayy, GL_RGB, GL_FLOAT, 0));
+  std::shared_ptr<GLT::Texture2D> gNormal(new GLT::Texture2D(
+    0, GL_RGB16F, displayx, displayy, GL_RGB, GL_FLOAT, 0));
+  std::shared_ptr<GLT::Texture2D> gAlbedo(new GLT::Texture2D(
+    0, GL_RGBA, displayx, displayy, GL_RGBA, GL_UNSIGNED_BYTE, 0));
 
   // Create renderbuffer to serve as depth buffer
   GLT::RenderBuffer gDepth = GLT::RenderBuffer(
@@ -86,13 +86,13 @@ int main(int argc, char **argv) {
 
   // Create G-buffer
   GLT::FrameBuffer gBuffer;
-  gBuffer.AttachTexture2D(gPosition);
-  gBuffer.AttachTexture2D(gNormal);
-  gBuffer.AttachTexture2D(gAlbedo);
+  gBuffer.AttachTexture2D(*gPosition);
+  gBuffer.AttachTexture2D(*gNormal);
+  gBuffer.AttachTexture2D(*gAlbedo);
   gBuffer.AttachRenderBuffer(gDepth, GL_DEPTH_ATTACHMENT);
 
   // Create fullscreen quad for g-buffer rendering
-  ScreenQuad frameMesh(gBuffer.GetColorBuffers());
+  ScreenQuad frameMesh({gPosition, gNormal, gAlbedo});
 
   // Set lighting uniforms in lighting shader
   lightingShader.GetUniform("lights[0]").SetFMat2x3(lights.data(), lights.size());
